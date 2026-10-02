@@ -1,0 +1,18 @@
+{
+  "name": "result-forwarding-system-ui",
+  "private": true,
+  "scripts": {
+    "build:css": "npx @tailwindcss/cli -i ./app/static/css/input.css -o ./app/static/css/app.css --minify",
+    "watch:css": "npx @tailwindcss/cli -i ./app/static/css/input.css -o ./app/static/css/app.css --watch"
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.3.2",
+    "daisyui": "^5.6.16",
+    "tailwindcss": "^4.3.2"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.118",
+    "@iconify-json/mdi": "^1.2.3",
+    "@iconify/tailwind4": "^1.2.3"
+  }
+}

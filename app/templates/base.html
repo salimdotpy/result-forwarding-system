@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en" data-theme="corporate">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ app_name }}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/app.css') }}">
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body class="min-h-screen bg-base-200 text-base-content">
+  {% include "partials/flashes.html" %}
+  {% if user %}
+  <div class="drawer lg:drawer-open">
+    <input id="main-drawer" type="checkbox" class="drawer-toggle">
+    <div class="drawer-content min-h-screen">
+      <header class="navbar sticky top-0 z-30 border-b border-base-300 bg-base-100/95 backdrop-blur">
+        <div class="flex-none lg:hidden"><label for="main-drawer" class="btn btn-square btn-ghost"><span
+              class="icon-[mdi--menu] text-xl"></span></label></div>
+        <div class="flex-1">
+          <div class="px-2 text-sm font-semibold text-base-content/70">Result Forwarding Management System</div>
+        </div>
+        <div class="flex-none gap-2">
+          <a href="/notifications" class="btn btn-ghost btn-circle relative" aria-label="Notifications"><span
+              class="icon-[mdi--bell-outline] text-xl"></span>{% if unread %}<span
+              class="badge badge-error badge-xs absolute right-1 top-1"></span>{% endif %}</a>
+          <div class="dropdown dropdown-end">
+            <div tabindex="0" role="button" class="btn btn-ghost h-auto min-h-10 gap-2">
+              <div class="avatar placeholder">
+                <div class="w-8 rounded-full bg-primary text-primary-content"><span>{{ user.full_name[:1]|upper
+                    }}</span></div>
+              </div><span class="hidden sm:inline">{{ user.full_name }}</span><span
+                class="icon-[mdi--chevron-down]"></span>
+            </div>
+            <ul tabindex="0"
+              class="menu dropdown-content z-50 mt-2 w-52 rounded-box border border-base-300 bg-base-100 p-2 shadow-lg">
+              <li><a href="/dashboard"><span class="icon-[mdi--view-dashboard-outline]"></span>Dashboard</a></li>
+              <li><a href="/notifications"><span class="icon-[mdi--bell-outline]"></span>Notifications</a></li>
+              <li><a href="/reports"><span class="icon-[mdi--file-chart-outline]"></span>Reports</a></li>
+              <li>
+                <form method="post" action="/logout"><button class="w-full"><span class="icon-[mdi--logout]"></span>Sign
+                    out</button></form>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <main class="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+    <aside class="drawer-side z-40">
+      <label for="main-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+      <div class="flex min-h-full w-72 flex-col border-r border-base-300 bg-base-100">
+        <div class="flex h-16 items-center gap-3 border-b border-base-300 px-5">
+          <div class="grid size-10 place-items-center rounded-xl bg-primary text-primary-content"><span
+              class="icon-[mdi--school-outline] text-2xl"></span></div>
+          <div>
+            <div class="font-bold leading-tight">Result Forwarding</div>
+            <div class="text-xs text-base-content/50">Institutional Workflow</div>
+          </div>
+        </div>
+        <nav class="flex-1 p-3">
+          <div class="menu gap-1">
+            <li class="menu-title">Workspace</li>
+            <li><a href="/dashboard"><span class="icon-[mdi--view-dashboard-outline]"></span>Dashboard</a></li>
+            {% if user.role.value == 'lecturer' %}<li><a href="/results/new"><span
+                  class="icon-[mdi--cloud-upload-outline]"></span>Upload / Submit Result</a></li>{% endif %}
+            <li><a href="/results"><span class="icon-[mdi--file-document-multiple-outline]"></span>Result
+                Submissions</a></li>
+            <li><a href="/notifications"><span class="icon-[mdi--bell-outline]"></span>Notifications{% if unread %}<span
+                  class="badge badge-primary badge-sm ml-auto">{{ unread }}</span>{% endif %}</a></li>
+            <li><a href="/reports"><span class="icon-[mdi--file-chart-outline]"></span>Reports</a></li>
+            {% if user.role.value == 'admin' %}
+            <li class="menu-title mt-4">Administration</li>
+            <li><a href="/admin/users"><span class="icon-[mdi--account-group-outline]"></span>User Management</a></li>
+            <li><a href="/admin/organization"><span class="icon-[mdi--domain]"></span>Faculties & Departments</a></li>
+            <li><a href="/admin/audit">
+                <span class=""></span>Audit Logs</a></li>
+            {% endif %}
+          </div>
+        </nav>
+        <div class="border-t border-base-300 p-4">
+          <div class="rounded-xl bg-base-200 p-3">
+            <div class="text-xs uppercase tracking-wide text-base-content/50">Signed in as</div>
+            <div class="mt-1 font-semibold">{{ user.full_name }}</div>
+            <div class="mt-1 text-xs text-base-content/60">{{ user.role.value|role_label }}</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+  {% else %}{% block public_content %}{% endblock %}{% endif %}
+  <script src="{{ url_for('static', path='js/app.js') }}"></script>
+</body>
+
+</html>

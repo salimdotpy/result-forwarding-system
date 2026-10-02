@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.env
+node_modules/
+app/static/css/app.css
+uploads/
+.DS_Store
+.idea/
+.vscode/
+app/templates/partials/flashes.html
+app/seed_old.py

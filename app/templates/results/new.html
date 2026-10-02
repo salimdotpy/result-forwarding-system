@@ -1,0 +1,63 @@
+{% extends "base.html" %}{% block title %}Upload Result · {{ app_name }}{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-4xl">
+    <div class="breadcrumbs text-sm">
+        <ul>
+            <li><a href="/results">Result Submissions</a></li>
+            <li>New Submission</li>
+        </ul>
+    </div>
+    <div class="mt-3 mb-6">
+        <h1 class="text-3xl font-bold">Upload result submission</h1>
+        <p class="mt-1 text-base-content/60">Import student result records, review the file format, and submit for
+            Examination Officer verification.</p>
+    </div>
+    {% if error %}<div class="alert alert-error mb-5"><span class="icon-[mdi--alert-circle-outline]"></span><span>{{
+            error }}</span></div>{% endif %}
+    <form method="post" action="/results/new" enctype="multipart/form-data" class="space-y-5">
+        <div class="card border border-base-300 bg-base-100 shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title text-lg">Result information</h2>
+                <div class="mt-3 grid gap-4 md:grid-cols-2"><label class="form-control"><span
+                            class="label-text mb-2 font-medium">Academic session</span><input name="academic_session"
+                            required placeholder="2025/2026" class="input input-bordered"></label><label
+                        class="form-control"><span class="label-text mb-2 font-medium">Semester</span><select
+                            name="semester" required class="select select-bordered">{% for item in semesters %}<option
+                                value="{{ item.value }}">{{ item.value }}</option>{% endfor %}</select></label><label
+                        class="form-control"><span class="label-text mb-2 font-medium">Faculty</span><select
+                            name="faculty_id" required class="select select-bordered">{% for item in faculties %}<option
+                                value="{{ item.id }}">{{ item.name }} ({{ item.code }})</option>{% endfor
+                            %}</select></label><label class="form-control"><span
+                            class="label-text mb-2 font-medium">Department</span><select name="department_id" required
+                            class="select select-bordered">{% for item in departments %}<option value="{{ item.id }}">{{
+                                item.name }} ({{ item.code }})</option>{% endfor %}</select></label><label
+                        class="form-control md:col-span-2"><span
+                            class="label-text mb-2 font-medium">Course</span><select name="course_id" required
+                            class="select select-bordered">{% for item in courses %}<option value="{{ item.id }}">{{
+                                item.code }} — {{ item.title }} ({{ item.units }} units)</option>{% endfor
+                            %}</select></label></div>
+            </div>
+        </div>
+        <div class="card border border-base-300 bg-base-100 shadow-sm">
+            <div class="card-body">
+                <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
+                    <div>
+                        <h2 class="card-title text-lg">Result file</h2>
+                        <p class="mt-1 text-sm text-base-content/60">Supported formats: CSV and XLSX. Required columns:
+                            student ID/matric number, student name, score. Optional: grade, remark.</p>
+                    </div>
+                    <div class="badge badge-outline">Max {{ config.max_upload_size_mb if config else 10 }} MB</div>
+                </div><input type="file" name="file" accept=".csv,.xlsx" required
+                    class="file-input file-input-bordered mt-4 w-full">
+                <div class="alert mt-4 bg-base-200"><span class="icon-[mdi--information-outline]"></span><span
+                        class="text-sm">The system validates obvious formatting and score errors before the submission
+                        enters the forwarding workflow.</span></div>
+            </div>
+        </div>
+        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"><a href="/results"
+                class="btn btn-ghost">Cancel</a><button class="btn btn-primary"
+                onclick="return confirm('Submit this result for Examination Officer verification?')"><span
+                    class="icon-[mdi--send-outline]"></span>Validate & Submit</button></div>
+    </form>
+</div>
+{% endblock %}

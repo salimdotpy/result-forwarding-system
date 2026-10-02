@@ -1,0 +1,22 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: result-forwarding-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: result_forwarding
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: resultapp
+      MYSQL_PASSWORD: resultpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - result_forwarding_mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpassword"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  result_forwarding_mysql:

@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% block title %}Something went wrong · {{ app_name }}{% endblock %}{% block public_content %}
+<div class="grid min-h-screen place-items-center bg-base-200 p-6">
+    <div class="card w-full max-w-lg border border-base-300 bg-base-100 shadow-xl">
+        <div class="card-body items-center text-center">
+            <div class="grid size-16 place-items-center rounded-2xl bg-error/10 text-error">
+                <span class="text-4xl"></span>
+            </div>
+            <h1 class="mt-4 text-2xl font-bold">Something went wrong</h1>
+            <p class="text-base-content/60">We couldn't complete that request. Please try again. Technical details have
+                been logged for administrators.</p>
+            <div class="card-actions mt-4"><button onclick="history.back()" class="btn btn-ghost">Go back</button><a
+                    href="/" class="btn btn-primary">Return home</a></div>
+        </div>
+    </div>
+</div>{% endblock %}

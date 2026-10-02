@@ -1,0 +1,81 @@
+{% extends "base.html" %}{% block title %}Dashboard · {{ app_name }}{% endblock %}
+{% block content %}
+<div class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+    <div>
+        <div class="breadcrumbs text-sm">
+            <ul>
+                <li>Workspace</li>
+                <li>Dashboard</li>
+            </ul>
+        </div>
+        <h1 class="mt-2 text-3xl font-bold">Good day, {{ user.full_name.split(' ')[0] }}.</h1>
+        <p class="mt-1 text-base-content/60">Here is the current state of your result-forwarding workload.</p>
+    </div>{% if user.role.value == 'lecturer' %}<a href="/results/new" class="btn btn-primary"><span
+            class="icon-[mdi--cloud-upload-outline]"></span>Upload / Submit Result</a>{% endif %}
+</div>
+<div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    {% set cards = [('Submitted','Submitted','info'),('Under Verification','Under Verification','warning'),('Returned
+    for Correction','Returned','error'),('Verified','Verified','success')] if user.role.value == 'lecturer' else
+    [('Submitted','Pending','info'),('Under Verification','Verification','warning'),('HOD Approved','HOD
+    approved','primary'),('Dean Approved','Dean approved','primary')] %}
+    {% for key,label,color in cards %}<div class="card border border-base-300 bg-base-100 shadow-sm">
+        <div class="card-body p-5">
+            <div class="flex items-center justify-between"><span class="text-sm font-medium text-base-content/60">{{
+                    label }}</span><span class="badge badge-{{ color }} badge-outline">{{ counts.get(key, 0) }}</span>
+            </div>
+            <div class="mt-2 text-3xl font-bold">{{ counts.get(key, 0) }}</div>
+        </div>
+    </div>{% endfor %}
+</div>
+<div class="mt-8 grid gap-6 xl:grid-cols-[1fr_320px]">
+    <div class="card border border-base-300 bg-base-100 shadow-sm">
+        <div class="card-body p-0">
+            <div class="flex items-center justify-between border-b border-base-300 p-5">
+                <div>
+                    <h2 class="font-bold">Recent result activity</h2>
+                    <p class="text-sm text-base-content/60">Latest submissions visible to your role.</p>
+                </div><a class="btn btn-ghost btn-sm" href="/results">View all <span
+                        class="icon-[mdi--arrow-right]"></span></a>
+            </div>{% if items %}<div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Reference</th>
+                            <th>Session</th>
+                            <th>Status</th>
+                            <th>Updated</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>{% for row in items %}<tr class="hover">
+                            <td class="font-semibold">{{ row.reference }}</td>
+                            <td>{{ row.academic_session }} · {{ row.semester.value }}</td>
+                            <td><span class="badge {{ status_classes(row.status.value) }} badge-sm">{{ row.status.value
+                                    }}</span></td>
+                            <td class="text-sm text-base-content/60">{{ row.updated_at.strftime('%d %b %Y %H:%M') }}
+                            </td>
+                            <td><a class="btn btn-ghost btn-sm" href="/results/{{ row.id }}">Open</a></td>
+                        </tr>{% endfor %}</tbody>
+                </table>
+            </div>{% else %}<div class="p-10 text-center"><span
+                    class="icon-[mdi--file-document-outline] text-4xl text-base-content/30"></span>
+                <p class="mt-3 font-semibold">No result activity yet</p>
+                <p class="text-sm text-base-content/50">Your visible result submissions will appear here.</p>
+            </div>{% endif %}
+        </div>
+    </div>
+    <div class="card border border-base-300 bg-base-100 shadow-sm">
+        <div class="card-body">
+            <h2 class="font-bold">Workflow</h2>
+            <p class="text-sm text-base-content/60">Every submission follows the required institutional path.</p>
+            <ul class="steps steps-vertical mt-4">
+                <li class="step step-primary">Lecturer</li>
+                <li class="step">Examination Officer</li>
+                <li class="step">HOD</li>
+                <li class="step">Dean</li>
+                <li class="step">Academic Planning Unit</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

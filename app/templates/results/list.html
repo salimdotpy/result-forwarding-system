@@ -1,0 +1,27 @@
+{% extends "base.html" %}{% block title %}Result Submissions · {{ app_name }}{% endblock %}
+{% block content %}
+<div class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+    <div>
+        <div class="breadcrumbs text-sm">
+            <ul>
+                <li>Workspace</li>
+                <li>Result Submissions</li>
+            </ul>
+        </div>
+        <h1 class="mt-2 text-3xl font-bold">Result submissions</h1>
+        <p class="mt-1 text-base-content/60">Search and track result forwarding records within your authorized scope.
+        </p>
+    </div>{% if user.role.value == 'lecturer' %}<a href="/results/new" class="btn btn-primary"><span
+            class="icon-[mdi--plus]"></span>New submission</a>{% endif %}
+</div>
+<form hx-get="/results" hx-target="#results-table" hx-push-url="true"
+    class="card mb-5 border border-base-300 bg-base-100 shadow-sm">
+    <div class="card-body grid gap-3 p-4 md:grid-cols-[1fr_220px_auto]"><input name="q" value="{{ q }}"
+            placeholder="Search reference or academic session" class="input input-bordered w-full"><select
+            name="status_filter" class="select select-bordered">
+            <option value="">All statuses</option>{% for s in statuses %}<option value="{{ s }}" {% if status_filter==s
+                %}selected{% endif %}>{{ s }}</option>{% endfor %}
+        </select><button class="btn btn-primary"><span class="icon-[mdi--magnify]"></span>Filter</button></div>
+</form>
+<div id="results-table">{% include "partials/result_rows.html" %}</div>
+{% endblock %}

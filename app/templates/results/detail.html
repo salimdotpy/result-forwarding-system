@@ -1,0 +1,168 @@
+{% extends "base.html" %}{% block title %}{{ submission.reference }} · {{ app_name }}{% endblock %}
+{% block content %}
+<div class="mb-5 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+    <div>
+        <div class="breadcrumbs text-sm">
+            <ul>
+                <li><a href="/results">Result Submissions</a></li>
+                <li>{{ submission.reference }}</li>
+            </ul>
+        </div>
+        <div class="mt-2 flex flex-wrap items-center gap-3">
+            <h1 class="text-3xl font-bold">{{ submission.reference }}</h1><span
+                class="badge {{ status_classes(submission.status.value) }}">{{ submission.status.value }}</span>
+        </div>
+        <p class="mt-1 text-base-content/60">{{ course.code }} — {{ course.title }}</p>
+    </div><a href="/results" class="btn btn-ghost"><span class="icon-[mdi--arrow-left]"></span>Back</a>
+</div>
+<div class="grid gap-5 xl:grid-cols-[1fr_330px]">
+    <div class="space-y-5">
+        <div class="card border border-base-300 bg-base-100 shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title text-lg">Submission information</h2>
+                <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <div>
+                        <div class="text-xs uppercase tracking-wide text-base-content/50">Academic session</div>
+                        <div class="mt-1 font-semibold">{{ submission.academic_session }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wide text-base-content/50">Semester</div>
+                        <div class="mt-1 font-semibold">{{ submission.semester.value }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wide text-base-content/50">Faculty</div>
+                        <div class="mt-1 font-semibold">{{ faculty.name }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wide text-base-content/50">Department</div>
+                        <div class="mt-1 font-semibold">{{ department.name }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wide text-base-content/50">Course</div>
+                        <div class="mt-1 font-semibold">{{ course.code }} — {{ course.title }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wide text-base-content/50">Lecturer</div>
+                        <div class="mt-1 font-semibold">{{ lecturer.full_name }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card border border-base-300 bg-base-100 shadow-sm">
+            <div class="card-body p-0">
+                <div class="border-b border-base-300 p-5">
+                    <h2 class="font-bold">Student result records</h2>
+                    <p class="text-sm text-base-content/60">{{ records|length }} record(s) imported with this
+                        submission.</p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="table table-zebra">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Matric Number</th>
+                                <th>Student Name</th>
+                                <th>Score</th>
+                                <th>Grade</th>
+                                <th>Remark</th>
+                            </tr>
+                        </thead>
+                        <tbody>{% for row in records %}<tr>
+                                <td>{{ loop.index }}</td>
+                                <td class="font-medium">{{ row.matric_number }}</td>
+                                <td>{{ row.student_name }}</td>
+                                <td>{{ row.score }}</td>
+                                <td>{{ row.grade or '—' }}</td>
+                                <td>{{ row.remark or '—' }}</td>
+                            </tr>{% else %}<tr>
+                                <td colspan="6" class="p-8 text-center">No student records.</td>
+                            </tr>{% endfor %}</tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="space-y-5">
+        <div class="card border border-base-300 bg-base-100 shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title text-lg">Available action</h2>
+                <div class="mt-4 space-y-2">
+                    {% if user.role.value == 'examination_officer' and submission.status.value == 'Submitted' %}<form
+                        method="post" action="/results/{{ submission.id }}/action"><input type="hidden"
+                            name="action_name" value="start_verification"><button class="btn btn-primary w-full"><span
+                                class="icon-[mdi--magnify]"></span>Start Verification</button></form>{% elif
+                    user.role.value == 'examination_officer' and submission.status.value == 'Under Verification' %}<form
+                        method="post" action="/results/{{ submission.id }}/action"><input type="hidden"
+                            name="action_name" value="verify"><button class="btn btn-success w-full"
+                            onclick="return confirm('Verify this result and forward it to the HOD?')"><span
+                                class="icon-[mdi--check-circle-outline]"></span>Verify & Forward to HOD</button></form>
+                    <button class="btn btn-outline btn-error w-full"
+                        onclick="document.getElementById('return-dialog').showModal()"><span
+                            class="icon-[mdi--undo]"></span>Return for Correction</button>
+                    {% elif user.role.value == 'hod' and submission.status.value == 'Verified' %}<form method="post"
+                        action="/results/{{ submission.id }}/action"><input type="hidden" name="action_name"
+                            value="hod_approve"><button class="btn btn-primary w-full"
+                            onclick="return confirm('Approve this result and forward it to the Dean?')"><span
+                                class="icon-[mdi--check-decagram-outline]"></span>Approve & Forward to Dean</button>
+                    </form><button class="btn btn-outline btn-error w-full"
+                        onclick="document.getElementById('return-dialog').showModal()">Return / Reject</button>
+                    {% elif user.role.value == 'dean' and submission.status.value == 'HOD Approved' %}<form
+                        method="post" action="/results/{{ submission.id }}/action"><input type="hidden"
+                            name="action_name" value="dean_approve"><button class="btn btn-primary w-full"
+                            onclick="return confirm('Approve this result and forward it to Academic Planning Unit?')"><span
+                                class="icon-[mdi--check-decagram-outline]"></span>Approve & Forward</button></form>
+                    <button class="btn btn-outline btn-error w-full"
+                        onclick="document.getElementById('return-dialog').showModal()">Return / Reject</button>
+                    {% elif user.role.value == 'dean' and submission.status.value == 'Dean Approved' %}<form
+                        method="post" action="/results/{{ submission.id }}/action"><input type="hidden"
+                            name="action_name" value="forward"><button class="btn btn-primary w-full"><span
+                                class="icon-[mdi--send-check-outline]"></span>Forward to Academic Planning</button>
+                    </form>{% elif user.role.value == 'academic_planning' and submission.status.value == 'Forwarded' %}
+                    <form method="post" action="/results/{{ submission.id }}/action"><input type="hidden"
+                            name="action_name" value="receive"><button class="btn btn-success w-full"
+                            onclick="return confirm('Confirm receipt of this forwarded result?')"><span
+                                class="icon-[mdi--check-circle-outline]"></span>Confirm Receipt</button></form>
+                    {% elif user.role.value == 'lecturer' and submission.status.value == 'Returned for Correction' %}
+                    <form method="post" action="/results/{{ submission.id }}/action"><input type="hidden"
+                            name="action_name" value="resubmit"><button class="btn btn-primary w-full">Resubmit after
+                            correction</button></form>{% else %}<div
+                        class="rounded-xl bg-base-200 p-4 text-sm text-base-content/60">There are no actions available
+                        to your role at this workflow stage.</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="card border border-base-300 bg-base-100 shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title text-lg">Forwarding history</h2>
+                <ul class="timeline timeline-vertical mt-3">{% for event in events %}<li>
+                        <div class="timeline-start text-xs text-base-content/50">{{ event.created_at.strftime('%d %b
+                            %H:%M') }}</div>{% if not loop.first %}
+                        <hr>{% endif %}<div class="timeline-middle"><span
+                                class="icon-[mdi--check-circle-outline] text-primary"></span></div>
+                        <div class="timeline-end pb-5 pl-3">
+                            <div class="font-semibold">{{ event.action }}</div>
+                            <div class="text-xs text-base-content/50">{{ actor_names.get(event.actor_id, 'System') }}
+                            </div>{% if event.comment %}<div class="mt-2 rounded-lg bg-base-200 p-2 text-sm">{{
+                                event.comment }}</div>{% endif %}
+                        </div>{% if not loop.last %}
+                        <hr>{% endif %}
+                    </li>{% else %}<li>No workflow history recorded.</li>{% endfor %}</ul>
+            </div>
+        </div>
+    </div>
+</div>
+<dialog id="return-dialog" class="modal">
+    <div class="modal-box">
+        <h3 class="text-lg font-bold">Return result</h3>
+        <p class="py-2 text-sm text-base-content/60">Provide the reason so the lecturer knows what needs correction.</p>
+        <form method="post" action="/results/{{ submission.id }}/action" class="mt-4"><input type="hidden"
+                name="action_name" value="return"><textarea name="comment" required minlength="5"
+                class="textarea textarea-bordered h-28 w-full"
+                placeholder="Describe the correction required..."></textarea>
+            <div class="modal-action"><button type="button" class="btn btn-ghost"
+                    onclick="document.getElementById('return-dialog').close()">Cancel</button><button
+                    class="btn btn-error">Return for Correction</button></div>
+        </form>
+    </div>
+</dialog>
+{% endblock %}

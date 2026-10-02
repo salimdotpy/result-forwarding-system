@@ -1,0 +1,38 @@
+{% extends "base.html" %}{% block title %}Sign in · {{ app_name }}{% endblock %}
+{% block public_content %}
+<div class="grid min-h-screen place-items-center bg-linear-to-br from-base-200 via-base-100 to-primary/10 p-4">
+  <div class="w-full max-w-md">
+    <div class="mb-8 text-center">
+      <div class="mx-auto grid size-16 place-items-center rounded-2xl bg-primary text-primary-content shadow-lg"><span
+          class="icon-[mdi--school-outline] text-4xl"></span></div>
+      <h1 class="mt-5 text-2xl font-bold">Result Forwarding</h1>
+      <p class="mt-2 text-sm text-base-content/60">Secure institutional examination-result workflow</p>
+    </div>
+    <div class="card border border-base-300 bg-base-100 shadow-xl">
+      <div class="card-body p-6 sm:p-8">
+        <h2 class="card-title">Welcome back</h2>
+        <p class="text-sm text-base-content/60">Sign in to continue to your role workspace.</p>
+        {% if error %}<div class="alert alert-error mt-4"><span class="icon-[mdi--alert-circle-outline]"></span><span>{{
+            error }}</span></div>{% endif %}
+        <form method="post" action="/login" class="mt-5 space-y-6">
+          <label class="form-control block">
+            <span class="label-text mb-2 font-medium">Email</span>
+            <input name="email" type="email" autocomplete="username" required placeholder="you@institution.edu"
+              class="input input-bordered w-full">
+          </label>
+          <label class="form-control block">
+            <span class="label-text mb-2 font-medium">Password</span>
+            <input name="password" type="password" autocomplete="current-password" required placeholder="••••••••"
+              class="input input-bordered w-full">
+          </label>
+          <button class="btn btn-primary w-full">
+            <span class="icon-[mdi--login]"></span>
+            Sign in
+          </button>
+        </form>
+      </div>
+    </div>
+    <p class="mt-5 text-center text-xs text-base-content/50">Authorized institutional users only</p>
+  </div>
+</div>
+{% endblock %}
